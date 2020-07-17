@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 from utils import generate_real_index
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import MultinomialNB, CategoricalNB
 
 class NaiveBayes(BaseEstimator, ClassifierMixin):
     def __init__(self):
@@ -83,8 +83,9 @@ class NaiveBayes(BaseEstimator, ClassifierMixin):
 
 
 class SequentialNaiveBayes(BaseEstimator, ClassifierMixin):
-    def __init__(self, stop_criterion=0.95):
-        self.naive_bayes_classifier = MultinomialNB()
+    def __init__(self, min_categories, stop_criterion=0.95):
+        self.naive_bayes_classifier = CategoricalNB(min_categories=min_categories)
+        self.min_categories =  min_categories
         self.X = None
         self.y = None
         self.stop_criterion = stop_criterion
@@ -92,6 +93,7 @@ class SequentialNaiveBayes(BaseEstimator, ClassifierMixin):
         self.classes_ = None
 
     def fit(self, X, y):
+
         self.X = X
         self.y = y
 
@@ -99,13 +101,14 @@ class SequentialNaiveBayes(BaseEstimator, ClassifierMixin):
         already_predicted = []
         already_predicted_indices = []
         for number_of_features in range(1, self.X.shape[1] + 1):
+
             X_train = self.X[:, :number_of_features]
             not_yet_predicted = np.array([row for i, row in enumerate(X) if
                                           i not in already_predicted_indices])
             if len(not_yet_predicted) == 0:
                 break
             X_predict = not_yet_predicted[:, :number_of_features]
-
+            self.naive_bayes_classifier = CategoricalNB(min_categories=self.min_categories[:number_of_features])
             self.naive_bayes_classifier.fit(X_train, self.y)
             predictions = self.naive_bayes_classifier.predict_proba(X_predict)
 

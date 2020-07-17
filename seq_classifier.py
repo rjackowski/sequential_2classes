@@ -1,12 +1,14 @@
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import MultinomialNB, CategoricalNB
 import numpy as np
+from utils import get_min_categories
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
 
 class Sequential2ClassesNaiveBayes(BaseEstimator, ClassifierMixin):
-    def __init__(self, stop_criterion=0.87):
-        self.naive_bayes_classifier = MultinomialNB()
+    def __init__(self, min_categories, stop_criterion=0.87):
+        self.min_categories = min_categories
+        self.naive_bayes_classifier = CategoricalNB(min_categories=self.min_categories)
         self.X = None
         self.y = None
         self.stop_criterion = stop_criterion
@@ -25,9 +27,8 @@ class Sequential2ClassesNaiveBayes(BaseEstimator, ClassifierMixin):
         number = 1
         unpredicted = [a for a in range(probe_amount)]
         myRange = np.array([np.array([a, 0, []]) for a in unpredicted])
-
         while number <= feature_amount:
-            self.naive_bayes_classifier = MultinomialNB()
+            self.naive_bayes_classifier = CategoricalNB(min_categories=self.min_categories[:number])
             self.naive_bayes_classifier.stop_criterion = self.stop_criterion
             self.naive_bayes_classifier.fit(self.X[:, :number], self.y)
             if len(unpredicted) == 0:
@@ -56,8 +57,8 @@ class Sequential2ClassesNaiveBayes(BaseEstimator, ClassifierMixin):
 
 
 class SequentialNaiveBayesOneVsRest(BaseEstimator, ClassifierMixin):
-    def __init__(self, stop_criterion=0.95):
-        self.sequentialNaiveBayes = Sequential2ClassesNaiveBayes()
+    def __init__(self, min_categories, stop_criterion=0.95):
+        self.sequentialNaiveBayes = Sequential2ClassesNaiveBayes(min_categories=min_categories)
         self.used_features = []
         self.stop_criterion = stop_criterion
         self.sequentialNaiveBayes.stop_criterion = stop_criterion
@@ -113,6 +114,10 @@ def optimize_stop_criterion_with_divide(X, y,
     checked = {}
     finished = False
     steps_number = 0;
+    min_categories = get_min_categories(X)
+    target_class_name = target_classifier.__class__
+    target_classifier = target_class_name(min_categories = min_categories)
+
 
     for train,test in kf.split(X,y):
         target_classifier.fit(X[train], y[train])
@@ -143,8 +148,9 @@ def optimize_stop_criterion_with_divide(X, y,
             mid_index = int(len(criterion_range) / 2)
         mid_value = criterion_range[mid_index]
 
+
         #Run classifier test
-        classifier = classifier_class(stop_criterion=mid_value)
+
         accuracyTable = np.array([])
         kf = StratifiedKFold(n_splits=folds_number)
 
@@ -152,6 +158,8 @@ def optimize_stop_criterion_with_divide(X, y,
             X_train = X[train]
             X_test = X[test]
             new_feature_order = feature_reorder(X_train, y[train])
+            new_min_categories = min_categories[ new_feature_order]
+            classifier = classifier_class(stop_criterion=mid_value, min_categories=new_min_categories)
             X_train = X_train[:, new_feature_order]
             X_test = X_test[:, new_feature_order]
             classifier.fit(X_train, y[train])

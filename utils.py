@@ -150,6 +150,7 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
     folds_costs = np.array([])
     used_costs = costs.copy()
     stop_criterion_values = np.array([])
+
     for train, test in folds:
         X_train_selected = X[train]
         y_train = y[train]
@@ -161,6 +162,7 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
             X_train_selected = X_train_selected[:, new_feature_order]
             X_test_selected = X_test_selected[:, new_feature_order]
             used_costs = used_costs[new_feature_order]
+            classifier =  classifier.__class__(get_min_categories(X[:,new_feature_order]))
 
         selected_features = list(range(X.shape[1]))
 
@@ -171,13 +173,14 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
             X_test_selected = X_test_selected[:, selected_features]
 
         if criterion_optimizer is not None:
+            print("stop_criterion")
             classifier.stop_criterion = criterion_optimizer(X_train_selected,
                                                             y_train)
             stop_criterion_values = np.append(stop_criterion_values,
                                               classifier.stop_criterion)
 
         classifier.fit(X_train_selected, y_train)
-
+        print("prediction")
         results = classifier.predict(X_test_selected)
 
         accuracy = accuracy_score(y_test, results)
@@ -207,6 +210,16 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
         save_data.add_data(folds_scores, mean_accuracy, folds_costs, mean_cost, stop_criterion_values)
 
     return mean_accuracy, mean_cost
+
+def get_min_categories(X):
+    min_categories = []
+    columnLength = len(X[0])
+    for i in range(0, columnLength):
+        column = X[:,i]
+        maxValue = int(np.amax(column)) +1
+        min_categories = np.append( min_categories, int(maxValue))
+    a = min_categories.astype(int)
+    return a
 
 
 

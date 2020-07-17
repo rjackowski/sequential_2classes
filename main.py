@@ -13,9 +13,9 @@ from feature_selection import best_first_feature_selection, \
     best_first_cost_sensitive_feature_selection
 from naive_bayes import SequentialNaiveBayes, NaiveBayes
 from utils import reorder_using_information_gain, generate_costs, \
-    test_classifier, test_stop_criterion, \
+    test_classifier, test_stop_criterion, get_min_categories,\
     optimize_sequential_classification_stop_criterion
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import MultinomialNB, CategoricalNB
 from dataSaving import SaveToExcel
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import LabelEncoder
@@ -76,9 +76,12 @@ def retrieve_data(file):
 
 
 def test_stop(X,y,costs,saveToExcel):
+
+
+
         criterion_optimizer = partial(
             seq_classifier.optimize_stop_criterion_with_divide,
-            target_classifier=MultinomialNB(),
+            target_classifier=CategoricalNB(),
             # classifier_class=seq_classifier.SequentialNaiveBayesOneVsRest,
             classifier_class=SequentialNaiveBayes,
             start=0.5,
@@ -90,7 +93,7 @@ def test_stop(X,y,costs,saveToExcel):
 
         criterion_optimizer2 = partial(
             optimize_sequential_classification_stop_criterion,
-            target_classifier=MultinomialNB(),
+            target_classifier=CategoricalNB(),
             # classifier_class=seq_classifier.SequentialNaiveBayesOneVsRest,
             classifier_class=SequentialNaiveBayes,
             criterion_range=np.arange(1, 0.5 - 0.01, -0.01),
@@ -113,11 +116,14 @@ def test_stop(X,y,costs,saveToExcel):
 
 def execute_multiclasses_sequential(X,y,costs,saveToExcel):
     print("Naive Bayes classifier scores (10-fold cross validation):")
-    sequential_naive_bayes = SequentialNaiveBayes()
+    min_categories = get_min_categories(X)
+    sequential_naive_bayes = SequentialNaiveBayes(min_categories=min_categories)
+
+
 
     criterion_optimizer = partial(
         seq_classifier.optimize_stop_criterion_with_divide,
-        target_classifier=MultinomialNB(),
+        target_classifier=CategoricalNB(min_categories=min_categories),
         classifier_class=SequentialNaiveBayes,
         start=0.5,
         finish=1,
@@ -140,7 +146,7 @@ def execute_multiclasses_sequential(X,y,costs,saveToExcel):
 
 
 def execute_feature_selection_comparation(X,y,costs,saveToExcel):
-    naive_bayes_classifier = MultinomialNB()
+    naive_bayes_classifier = CategoricalNB()
 
     saveToExcel.set_name("Best First Naive ")
     best_first_selection = partial(best_first_feature_selection)
@@ -179,7 +185,7 @@ def execute_feature_selection_comparation(X,y,costs,saveToExcel):
 def execute_onevsrest_sequential_decrease(X,y,costs,saveToExcel):
     criterion_optimizer = partial(
         optimize_sequential_classification_stop_criterion,
-        target_classifier=MultinomialNB(),
+        target_classifier=CategoricalNB(),
         classifier_class=seq_classifier.SequentialNaiveBayesOneVsRest,
         criterion_range=np.arange(1.0, 0.5-0.01, -0.01),
         feature_reorder=reorder_using_information_gain)
@@ -198,9 +204,11 @@ def execute_onevsrest_sequential_decrease(X,y,costs,saveToExcel):
                     save_data=saveToExcel)
 
 def execute_onevsrest_sequential_divide(X,y,costs,saveToExcel):
+    min_categories = get_min_categories(X)
+
     criterion_optimizer = partial(
         seq_classifier.optimize_stop_criterion_with_divide,
-        target_classifier=MultinomialNB(),
+        target_classifier=CategoricalNB(min_categories=min_categories),
         classifier_class=seq_classifier.SequentialNaiveBayesOneVsRest,
         start=0.5,
         finish=1,
@@ -210,7 +218,7 @@ def execute_onevsrest_sequential_divide(X,y,costs,saveToExcel):
 
     print(
         "Sequential One vs Rest classifier")
-    sequential_naive_bayes_classifier = seq_classifier.SequentialNaiveBayesOneVsRest()
+    sequential_naive_bayes_classifier = seq_classifier.SequentialNaiveBayesOneVsRest(min_categories=min_categories)
 
     saveToExcel.set_name("Sequential One vs Rest classifier")
     test_classifier(X, y, sequential_naive_bayes_classifier,
@@ -227,7 +235,9 @@ def execute_Naive_Bayes(X,y,costs,saveToExcel):
     print("Naive Bayes classifier scores (10-fold cross validation):")
     saveToExcel.set_name("Naive Bayes")
 
-    naive_bayes_classifier = MultinomialNB()
+    min_categories = get_min_categories(X)
+
+    naive_bayes_classifier = CategoricalNB(min_categories=min_categories)
     test_classifier(X, y, naive_bayes_classifier, None, None,
                                   None,
                                   costs,
