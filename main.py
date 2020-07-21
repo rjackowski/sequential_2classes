@@ -39,13 +39,13 @@ def execute():
 
         costs = generate_costs(X, 0, 100)
         print("Costs used for this file: {}".format(costs))
-        costs =np.array( [ 93 , 13,  76, 100,  86,  85,  95,  50,  72,  24,  69,  42,  27,  64,   7,  46,  11,  14,
-  56,  47  ,41 ,  9  , 7,  34  ,33  ,39,  48  ,52,  31  ,29,  65  ,57 , 64  ,57,   3 , 53,
-   0 , 14  ,55  ,70 , 24 , 90  ,67 , 94 , 33 , 77 , 34 , 47 , 50 , 48  ,22 ,  9 , 72,   9,
-  31  ,94 ,  3 , 53,  92  ,47 , 20,  10  ,15,  82  , 7,  23  ,58,  24  , 3,])
+  #       costs =np.array( [ 93 , 13,  76, 100,  86,  85,  95,  50,  72,  24,  69,  42,  27,  64,   7,  46,  11,  14,
+  # 56,  47  ,41 ,  9  , 7,  34  ,33  ,39,  48  ,52,  31  ,29,  65  ,57 , 64  ,57,   3 , 53,
+  #  0 , 14  ,55  ,70 , 24 , 90  ,67 , 94 , 33 , 77 , 34 , 47 , 50 , 48  ,22 ,  9 , 72,   9,
+  # 31  ,94 ,  3 , 53,  92  ,47 , 20,  10  ,15,  82  , 7,  23  ,58,  24  , 3,])
         saveToExcel = SaveToExcel(name=file)
 
-        # execute_Naive_Bayes(X,y,costs,saveToExcel)
+        execute_Naive_Bayes(X,y,costs,saveToExcel)
         # execute_feature_selection_comparation(X,y,costs,saveToExcel)
         execute_multiclasses_sequential(X,y,costs,saveToExcel)
         # execute_onevsrest_sequential_decrease(X,y,costs,saveToExcel)
