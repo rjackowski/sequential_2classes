@@ -108,7 +108,6 @@ def optimize_stop_criterion_with_divide(X, y,
                                                       folds_number=5,
                                                       mode="productive"):
 
-    return 1
 
     kf = StratifiedKFold(n_splits=folds_number)
     accuracyTable = np.array([])
