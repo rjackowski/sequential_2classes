@@ -23,10 +23,12 @@ class Sequential2ClassesNaiveBayes(BaseEstimator, ClassifierMixin):
 
     def predict_proba(self, X):
         probe_amount = len(X)
-        feature_amount = self.X.shape[1] + 1
+        feature_amount = self.X.shape[1]
         number = 1
         unpredicted = [a for a in range(probe_amount)]
         myRange = np.array([np.array([a, 0, []]) for a in unpredicted])
+
+
         while number <= feature_amount:
             self.naive_bayes_classifier = CategoricalNB(min_categories=self.min_categories[:number])
             self.naive_bayes_classifier.stop_criterion = self.stop_criterion
@@ -108,6 +110,8 @@ def optimize_stop_criterion_with_divide(X, y,
                                                       step=0.01,
                                                       folds_number=5,
                                                       mode="productive"):
+
+    return 1
 
     kf = StratifiedKFold(n_splits=folds_number)
     accuracyTable = np.array([])
