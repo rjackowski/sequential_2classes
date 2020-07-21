@@ -99,6 +99,7 @@ class SequentialNaiveBayes(BaseEstimator, ClassifierMixin):
     def predict_proba(self, X):
         already_predicted = []
         already_predicted_indices = []
+        print(self.X.shape[1] + 1)
         for number_of_features in range(1, self.X.shape[1] + 1):
             X_train = self.X[:, :number_of_features]
             not_yet_predicted = np.array([row for i, row in enumerate(X) if
