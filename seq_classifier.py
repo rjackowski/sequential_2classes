@@ -112,7 +112,8 @@ def optimize_stop_criterion_with_divide(X, y,
     accuracyTable = np.array([])
     checked = {}
     finished = False
-    steps_number = 0;
+    steps_number = 0
+
 
     for train,test in kf.split(X,y):
         target_classifier.fit(X[train], y[train])

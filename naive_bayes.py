@@ -82,6 +82,7 @@ class NaiveBayes(BaseEstimator, ClassifierMixin):
                 for instance_probabilities in self.predict_proba(X)]
 
 
+
 class SequentialNaiveBayes(BaseEstimator, ClassifierMixin):
     def __init__(self, stop_criterion=0.95):
         self.naive_bayes_classifier = MultinomialNB()
