@@ -182,7 +182,10 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
         print("prediction")
         results = classifier.predict(X_test_selected)
 
-        accuracy = accuracy_score(y_test, results)
+
+        successfull_predicted = accuracy_score(y_test, results, normalize=False)
+        accuracy = successfull_predicted / len(test) * 100
+
 
         folds_scores = np.append(folds_scores, accuracy)
         if not hasattr(classifier, 'used_features'):

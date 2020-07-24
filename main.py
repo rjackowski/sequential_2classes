@@ -57,7 +57,7 @@ def execute():
 
 
 def retrieve_data(file):
-    data = pd.read_csv(os.path.join(DATA_FILES_DIRECTORY, file),engine='python').to_numpy()
+    data = pd.read_csv(os.path.join(DATA_FILES_DIRECTORY, file),engine='python',header=None).to_numpy()
 
     print("Processing file: {}".format(file))
     X = data[:, :-1]
