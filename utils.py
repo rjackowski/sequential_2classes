@@ -3,8 +3,10 @@ from heapq import nlargest
 from random import randint
 
 import numpy as np
+import time
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
+from itertools import chain
 
 
 def generate_real_index(temporary_index, not_included_indices):
@@ -149,6 +151,10 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
     folds_costs = np.array([])
     used_costs = costs.copy()
     stop_criterion_values = np.array([])
+
+
+    start_time = time.time()
+
     for train, test in folds:
         X_train_selected = X[train]
         y_train = y[train]
@@ -181,8 +187,7 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
 
 
         successfull_predicted = accuracy_score(y_test, results, normalize=False)
-        accuracy = successfull_predicted / len(test) * 100
-
+        accuracy = float(successfull_predicted) / float(len(test)) * 100.00
 
         folds_scores = np.append(folds_scores, accuracy)
         if not hasattr(classifier, 'used_features'):
@@ -206,8 +211,10 @@ def test_classifier(X, y, classifier, feature_selection, feature_reorder,
             print("Stop criterion values: {}".format(stop_criterion_values))
 
     if save_data is not None:
-        save_data.add_data(folds_scores, mean_accuracy, folds_costs, mean_cost, stop_criterion_values)
-
+        generated_costs = []
+        generated_costs = np.append(generated_costs,[x for x in costs])
+        prediction_time = time.time() - start_time
+        save_data.add_data(folds_scores, mean_accuracy, folds_costs, mean_cost,generated_costs, prediction_time, stop_criterion_values)
     return mean_accuracy, mean_cost
 
 
