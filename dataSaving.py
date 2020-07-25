@@ -10,14 +10,18 @@ class SaveToExcel:
         self.meanAccuracySheet = self._wb.add_sheet('Mean Accuracy')
         self.costSheet = self._wb.add_sheet('Costs')
         self.meanCostSheet = self._wb.add_sheet('Mean Cost')
+        self.generatedCost = self._wb.add_sheet('Generated Costs')
+        self.predictionTime = self._wb.add_sheet('Prediction Time')
         self.criterionValuesSheet = self._wb.add_sheet('Stop Criterion Values')
         self.row = 0
 
-    def add_data(self,accuracies,mean_accuracy,costs,mean_cost,stop_criterion_values=numpy.array([])):
+    def add_data(self,accuracies,mean_accuracy,costs,mean_cost,generatedCost,predictionTime,stop_criterion_values=numpy.array([])):
         self._add_table(self.accuraciesSheet, accuracies)
         self._add_value(self.meanAccuracySheet, mean_accuracy)
         self._add_table(self.costSheet, costs)
         self._add_value(self.meanCostSheet, mean_cost)
+        self._add_table(self.generatedCost, generatedCost)
+        self._add_value(self.predictionTime, predictionTime)
         self._add_table(self.criterionValuesSheet, stop_criterion_values)
         self.row += 1
 
@@ -40,3 +44,5 @@ class SaveToExcel:
     def close(self):
         filename = self._name + '.xls'
         self._wb.save(os.path.join('./results', filename))
+
+
