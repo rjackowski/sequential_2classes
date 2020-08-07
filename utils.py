@@ -66,7 +66,7 @@ def reorder_using_information_gain(X, y):
     feature_information_gains = [[feature,information_gain(X[:, feature], y)] for feature
                                  in range(X.shape[1])]
 
-    feature_information_gains.sort(key=lambda x: x[1], reverse=Tgitrue)
+    feature_information_gains.sort(key=lambda x: x[1], reverse=True)
     new_feature_order = [feature[0] for feature in feature_information_gains]
 
     return new_feature_order

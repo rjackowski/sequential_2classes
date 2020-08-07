@@ -71,7 +71,6 @@ class SequentialNaiveBayesOneVsRest(BaseEstimator, ClassifierMixin):
     def predict_proba(self,X_predict):
         self.classes = np.unique(self.y)
         result = []
-git
         for x in X_predict:
             allClassesPred = []
 
